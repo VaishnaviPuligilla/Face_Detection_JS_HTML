@@ -3,13 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Face Detection with ONNX</title>
-    <script src="https://cdn.jsdelivr.net/npm/onnxruntime-web"></script>
+    <title>Face Detection with OpenCV.js</title>
+    <script src="https://docs.opencv.org/4.x/opencv.js" async></script>
+    <style>
+        video {
+            display: none; /* Hide video element */
+        }
+        canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+    </style>
 </head>
 <body>
-    <h1>Face Detection with ONNX Runtime</h1>
+    <h1>Face Detection with OpenCV.js</h1>
     <video id="webcam" autoplay></video>
-    <canvas id="output" style="position: absolute;"></canvas>
+    <canvas id="output"></canvas>
 
     <script src="script.js"></script>
 </body>
