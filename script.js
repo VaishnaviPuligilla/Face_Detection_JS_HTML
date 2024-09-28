@@ -1,17 +1,14 @@
 const video = document.getElementById('video');
 const canvas = document.getElementById('output');
 const ctx = canvas.getContext('2d');
-
-// Encrypt model data
+// encrypt model data
 function encryptData(data) {
     return CryptoJS.AES.encrypt(data, 'secret key 123').toString();
 }
-
-// Decrypt model data
+// decrypt model data
 function decryptData(encryptedData) {
     return CryptoJS.AES.decrypt(encryptedData, 'secret key 123').toString(CryptoJS.enc.Utf8);
 }
-
 async function setupCamera() {
     const stream = await navigator.mediaDevices.getUserMedia({
         video: true
@@ -24,11 +21,9 @@ async function setupCamera() {
         };
     });
 }
-
 async function loadFaceMeshModel() {
     const model = await facemesh.load();
     console.log('Face Mesh model loaded');
-
     // Example of how to encrypt some dummy model data
     const modelInfo = 'faceMeshModelInfo'; 
     const encryptedModelData = encryptData(modelInfo);
@@ -61,7 +56,6 @@ async function detectFaces(model) {
     });
     requestAnimationFrame(() => detectFaces(model));
 }
-
 async function main() {
     await setupCamera();
     canvas.width = video.videoWidth;
@@ -69,12 +63,5 @@ async function main() {
     const model = await loadFaceMeshModel();
     detectFaces(model);
 }
-
 main();
-
-async function startApp() {
-    await loadFaceMeshModel();
-    setupCamera();
-}
-
-window.onload = startApp;
+ORIGINAL JS
