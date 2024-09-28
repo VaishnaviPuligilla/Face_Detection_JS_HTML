@@ -31,9 +31,12 @@ async function detectFaces() {
 
     if (predictions.length > 0) {
         predictions.forEach(prediction => {
-            const [x, y, width, height] = prediction.boundingBox;
+            const start = prediction.boundingBox.topLeft;
+            const end = prediction.boundingBox.bottomRight;
+            const size = [end[0] - start[0], end[1] - start[1]];
+
             ctx.beginPath();
-            ctx.rect(x, y, width, height);
+            ctx.rect(start[0], start[1], size[0], size[1]);
             ctx.lineWidth = 2;
             ctx.strokeStyle = 'green';
             ctx.stroke();
