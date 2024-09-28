@@ -8,7 +8,6 @@
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/facemesh"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.9-1/crypto-js.js"></script>
     <style>
-        /* Original CSS styles */
         body {
             display: flex;
             flex-direction: column;
@@ -19,56 +18,38 @@
             font-family: Arial, sans-serif;
             margin: 0;
         }
-
         h1 {
             color: #333;
-            margin-bottom: 20px; /* Space below the title */
+            margin-bottom: 20px;
         }
-
         .description {
             width: 80%;
-            max-width: 600px; /* Adjusted width for better alignment */
+            max-width: 600px;
             text-align: justify;
             padding: 10px;
             background-color: #ffffff;
             border-radius: 5px;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            margin-top: 20px; /* Space above the description */
+            margin-top: 20px;
         }
-
-        /* Centering the video and canvas */
         .camera-container {
             position: relative;
             width: 640px;
             height: 480px;
-            margin-bottom: 20px; /* Space below the video */
+            margin-bottom: 20px;
         }
-
         #video {
             width: 100%;
             height: 100%;
-            border: 2px solid #4CAF50; /* Green border for the video */
+            border: 2px solid #4CAF50;
             border-radius: 5px;
-            display: block; /* Center the video */
         }
-
         canvas {
             position: absolute;
             left: 0;
             top: 0;
             border-radius: 5px;
         }
-
-        video {
-            position: absolute;
-            left: 0;
-            top: 0;
-            transform: scaleX(-1); /* Mirror the video */
-            border-radius: 5px;
-        }
-
-        /* New CSS properties for enhanced styling (if any) */
-        /* Retaining original styles, additional comments can be added here if necessary */
     </style>
 </head>
 <body>
@@ -78,11 +59,8 @@
         <canvas id="output"></canvas>
     </div>
     <div class="description">
-        <p>
-            This project enables face authentication using AI in the browser. It ensures model security to protect against tampering while providing an efficient user experience.
-        </p>
+        <p>This project enables face authentication using AI in the browser.</p>
     </div>
-
     <script src="indexedDB-setup.js"></script>
     <script src="model-cache-check.js"></script>
     <script src="model-cache-load.js"></script>
@@ -91,6 +69,5 @@
     <script src="model-cache-testing.js"></script>
     <script src="model-cache-optimization.js"></script>
     <script src="demo-page.js"></script>
-   
 </body>
 </html>
