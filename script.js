@@ -2,6 +2,16 @@ const video = document.getElementById('video');
 const canvas = document.getElementById('output');
 const ctx = canvas.getContext('2d');
 
+// Function to encrypt model data
+function encryptData(data) {
+    return CryptoJS.AES.encrypt(data, 'secret key 123').toString();
+}
+
+// Function to decrypt model data
+function decryptData(encryptedData) {
+    return CryptoJS.AES.decrypt(encryptedData, 'secret key 123').toString(CryptoJS.enc.Utf8);
+}
+
 async function setupCamera() {
     const stream = await navigator.mediaDevices.getUserMedia({
         video: true
@@ -15,29 +25,19 @@ async function setupCamera() {
     });
 }
 
-// Encrypt the model data (dummy example as model is not usually raw data)
-function encryptData(data) {
-    return CryptoJS.AES.encrypt(data, 'secret key 123').toString();
-}
-
-// Decrypt the model data (dummy example)
-function decryptData(encryptedData) {
-    return CryptoJS.AES.decrypt(encryptedData, 'secret key 123').toString(CryptoJS.enc.Utf8);
-}
-
 async function loadFaceMeshModel() {
     const model = await facemesh.load();
     console.log('Face Mesh model loaded');
-
-    // Encrypt the model info or data (if applicable)
-    const modelInfo = JSON.stringify(model); // Example, model itself isn't stringified this way
+    
+    // Example of how to encrypt some dummy model data
+    const modelInfo = 'faceMeshModelInfo'; // Replace with actual model data if needed
     const encryptedModelData = encryptData(modelInfo);
     console.log('Encrypted Model Data:', encryptedModelData);
-    
-    // Decrypt model info (if needed, use this step before using model)
+
+    // Decrypt model data if you need to log it or use it
     const decryptedModelInfo = decryptData(encryptedModelData);
     console.log('Decrypted Model Info:', decryptedModelInfo);
-
+    
     return model;
 }
 
