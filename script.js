@@ -10,14 +10,18 @@ cv.onRuntimeInitialized = () => {
 };
 
 async function setupWebcam() {
-    const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-    videoElement.srcObject = stream;
-
-    return new Promise((resolve) => {
-        videoElement.onloadedmetadata = () => {
-            resolve(videoElement);
-        };
-    });
+    try {
+        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+        videoElement.srcObject = stream;
+        
+        return new Promise((resolve) => {
+            videoElement.onloadedmetadata = () => {
+                resolve(videoElement);
+            };
+        });
+    } catch (error) {
+        console.error("Error accessing webcam: ", error);
+    }
 }
 
 async function detectFace() {
@@ -36,7 +40,7 @@ async function detectFace() {
 
     // Load Haar Cascade for face detection
     let faceCascade = new cv.CascadeClassifier();
-    faceCascade.load('haarcascade_frontalface_default.xml'); // Make sure to include this file
+    faceCascade.load('haarcascade_frontalface_default.xml'); // Ensure this file is available
 
     let faces = new cv.RectVector();
     let size = new cv.Size(30, 30);
