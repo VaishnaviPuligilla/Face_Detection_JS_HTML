@@ -1,48 +1,46 @@
+let facemesh;
+const videoElement = document.getElementById('webcam');
+const canvasElement = document.getElementById('output');
+const ctx = canvasElement.getContext('2d');
+
 async function setupWebcam() {
-    const webcamElement = document.getElementById('webcam');
-    const stream = await navigator.mediaDevices.getUserMedia({
-        video: true
-    });
-    webcamElement.srcObject = stream;
+    const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+    videoElement.srcObject = stream;
 
     return new Promise((resolve) => {
-        webcamElement.onloadedmetadata = () => {
-            resolve(webcamElement);
+        videoElement.onloadedmetadata = () => {
+            resolve(videoElement);
         };
     });
 }
 
 async function loadFaceMeshModel() {
-    const model = await facemesh.load();
+    facemesh = await facemesh.load();
     console.log("Face Mesh Model Loaded");
-    detectFace(model);
 }
 
-async function detectFace(model) {
-    const webcamElement = document.getElementById('webcam');
-    const canvasElement = document.getElementById('canvas');
-    const ctx = canvasElement.getContext('2d');
-
-    const predictions = await model.estimateFaces(webcamElement);
-
-    ctx.clearRect(0, 0, canvasElement.width, canvasElement.height); // Clear the canvas before drawing
+async function detectFace() {
+    const predictions = await facemesh.estimateFaces(videoElement);
+    ctx.clearRect(0, 0, canvasElement.width, canvasElement.height);
+    canvasElement.width = videoElement.videoWidth;
+    canvasElement.height = videoElement.videoHeight;
 
     if (predictions.length > 0) {
-        console.log("Face detected:", predictions);
         predictions.forEach(prediction => {
-            const { topLeft, bottomRight } = prediction.boundingBox; // Get bounding box coordinates
+            const [x, y, width, height] = prediction.boundingBox.topLeft;
             ctx.beginPath();
-            ctx.rect(topLeft[0], topLeft[1], bottomRight[0] - topLeft[0], bottomRight[1] - topLeft[1]);
+            ctx.rect(x, y, width, height);
             ctx.lineWidth = 2;
-            ctx.strokeStyle = 'red'; // Box color
+            ctx.strokeStyle = 'green';
             ctx.stroke();
         });
     }
 
-    requestAnimationFrame(() => detectFace(model));
+    requestAnimationFrame(detectFace);
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
     await setupWebcam();
     await loadFaceMeshModel();
+    detectFace();
 });
