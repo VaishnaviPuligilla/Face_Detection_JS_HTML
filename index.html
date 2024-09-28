@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Face Detection with OpenCV.js</title>
-    <script src="https://docs.opencv.org/4.x/opencv.js" async></script>
+    <title>Face Detection with TensorFlow.js</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/face-detection"></script>
     <style>
         video {
             width: 640px; /* Set a width for the video */
             height: auto;
-            display: block; /* Ensure the video is visible */
             border: 1px solid black;
         }
         canvas {
@@ -21,7 +21,7 @@
     </style>
 </head>
 <body>
-    <h1>Face Detection with OpenCV.js</h1>
+    <h1>Face Detection with TensorFlow.js</h1>
     <video id="webcam" autoplay></video>
     <canvas id="output"></canvas>
 
