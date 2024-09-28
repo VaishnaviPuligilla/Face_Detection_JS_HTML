@@ -30,10 +30,10 @@ async function detectFaces(model) {
         const bottomRight = prediction.boundingBox.bottomRight;
 
         // Calculate bounding box coordinates
-        const x = topLeft[0];
+        const x = canvas.width - bottomRight[0]; // Adjust x for mirroring
         const y = topLeft[1];
-        const width = bottomRight[0] - x;
-        const height = bottomRight[1] - y;
+        const width = bottomRight[0] - topLeft[0];
+        const height = bottomRight[1] - topLeft[1];
 
         // Draw the bounding box
         ctx.strokeStyle = 'red';
