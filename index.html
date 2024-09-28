@@ -43,6 +43,7 @@
             height: 100%;
             border: 2px solid #4CAF50;
             border-radius: 5px;
+            display: block; /* Ensure the video is displayed */
         }
         canvas {
             position: absolute;
@@ -55,21 +56,64 @@
 <body>
     <h1>Face Detection</h1>
     <div class="camera-container">
-        <video id="video" autoplay></video>
+        <video id="video" autoplay playsinline></video>
         <canvas id="output"></canvas>
     </div>
     <div class="description">
         <p>This project enables face authentication using AI in the browser.</p>
     </div>
-    <script src="script.js"></script>
+    <script>
+        async function setupCamera() {
+            const video = document.getElementById('video');
 
-    <script src="indexedDB-setup.js"></script>
-    <script src="model-cache-check.js"></script>
-    <script src="model-cache-load.js"></script>
-    <script src="model-cache-download.js"></script>
-    <script src="model-cache-initialize.js"></script>
-    <script src="model-cache-testing.js"></script>
-    <script src="model-cache-optimization.js"></script>
+            // Request access to the user's webcam
+            const stream = await navigator.mediaDevices.getUserMedia({
+                video: true
+            });
 
+            // Set the video source to the stream
+            video.srcObject = stream;
+
+            return new Promise((resolve) => {
+                video.onloadedmetadata = () => {
+                    resolve(video);
+                };
+            });
+        }
+
+        async function main() {
+            // Set up the camera
+            const video = await setupCamera();
+            video.play();
+
+            // Load the Face Mesh model
+            const net = await facemesh.load();
+            const ctx = document.getElementById('output').getContext('2d');
+
+            // Continuously detect faces
+            const detectFaces = async () => {
+                const predictions = await net.estimateFaces(video);
+
+                ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+
+                // Draw the detected faces on the canvas
+                predictions.forEach((prediction) => {
+                    const keypoints = prediction.scaledMesh;
+
+                    // Draw points
+                    ctx.fillStyle = '#32EEDB';
+                    keypoints.forEach(([x, y]) => {
+                        ctx.fillRect(x, y, 5, 5);
+                    });
+                });
+
+                requestAnimationFrame(detectFaces);
+            };
+
+            detectFaces();
+        }
+
+        main();
+    </script>
 </body>
 </html>
