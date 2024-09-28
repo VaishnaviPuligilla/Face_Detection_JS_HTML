@@ -18,10 +18,12 @@
             font-family: Arial, sans-serif;
             margin: 0;
         }
+
         h1 {
             color: #333;
             margin-bottom: 20px;
         }
+
         .description {
             width: 80%;
             max-width: 600px;
@@ -32,23 +34,34 @@
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
             margin-top: 20px;
         }
+
         .camera-container {
             position: relative;
             width: 640px;
             height: 480px;
             margin-bottom: 20px;
         }
+
         #video {
             width: 100%;
             height: 100%;
             border: 2px solid #4CAF50;
             border-radius: 5px;
-            display: block; /* Ensure the video is displayed */
+            display: block;
         }
+
         canvas {
             position: absolute;
             left: 0;
             top: 0;
+            border-radius: 5px;
+        }
+
+        video {
+            position: absolute;
+            left: 0;
+            top: 0;
+            transform: scaleX(-1); /* Mirror the video */
             border-radius: 5px;
         }
     </style>
@@ -56,64 +69,14 @@
 <body>
     <h1>Face Detection</h1>
     <div class="camera-container">
-        <video id="video" autoplay playsinline></video>
+        <video id="video" autoplay></video>
         <canvas id="output"></canvas>
     </div>
     <div class="description">
-        <p>This project enables face authentication using AI in the browser.</p>
+        <p>
+            This project enables face authentication using AI in the browser. It ensures model security to protect against tampering while providing an efficient user experience.
+        </p>
     </div>
-    <script>
-        async function setupCamera() {
-            const video = document.getElementById('video');
-
-            // Request access to the user's webcam
-            const stream = await navigator.mediaDevices.getUserMedia({
-                video: true
-            });
-
-            // Set the video source to the stream
-            video.srcObject = stream;
-
-            return new Promise((resolve) => {
-                video.onloadedmetadata = () => {
-                    resolve(video);
-                };
-            });
-        }
-
-        async function main() {
-            // Set up the camera
-            const video = await setupCamera();
-            video.play();
-
-            // Load the Face Mesh model
-            const net = await facemesh.load();
-            const ctx = document.getElementById('output').getContext('2d');
-
-            // Continuously detect faces
-            const detectFaces = async () => {
-                const predictions = await net.estimateFaces(video);
-
-                ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-
-                // Draw the detected faces on the canvas
-                predictions.forEach((prediction) => {
-                    const keypoints = prediction.scaledMesh;
-
-                    // Draw points
-                    ctx.fillStyle = '#32EEDB';
-                    keypoints.forEach(([x, y]) => {
-                        ctx.fillRect(x, y, 5, 5);
-                    });
-                });
-
-                requestAnimationFrame(detectFaces);
-            };
-
-            detectFaces();
-        }
-
-        main();
-    </script>
+    <script src="script.js"></script>
 </body>
 </html>
