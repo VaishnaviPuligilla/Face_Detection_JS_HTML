@@ -41,6 +41,7 @@
             border: 2px solid #4CAF50; /* Green border for the video */
             border-radius: 5px;
             margin-bottom: 20px; /* Space below the video */
+            display: block; /* Center the video */
         }
 
         canvas {
@@ -61,11 +62,13 @@
 </head>
 <body>
     <h1>Face Detection</h1>
-    <video id="video" autoplay></video>
-    <canvas id="output"></canvas>
+    <div style="position: relative; display: flex; justify-content: center;">
+        <video id="video" autoplay></video>
+        <canvas id="output"></canvas>
+    </div>
     <div class="description">
         <p>
-            This project enables face authentication using AI in the browser. It ensures model security to protect against tampering while providing efficient user experience.
+            This project enables face authentication using AI in the browser. It ensures model security to protect against tampering while providing an efficient user experience.
         </p>
     </div>
     <script src="script.js"></script>
