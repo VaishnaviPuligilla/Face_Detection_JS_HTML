@@ -2,7 +2,7 @@ let facemesh; // Declare the global variable for the Face Mesh model
 
 // Load the face mesh model
 async function loadFaceMeshModel() {
-    facemesh = await facemesh.load(); // Load the Face Mesh model
+    facemesh = await faceLandmarksModule.load(); // Load the Face Mesh model
     console.log("Face Mesh Model Loaded");
     detectFace(); // Start detecting faces after the model is loaded
 }
