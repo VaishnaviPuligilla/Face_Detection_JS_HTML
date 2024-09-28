@@ -6,23 +6,72 @@
     <title>Face Detection with TensorFlow.js</title>
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/facemesh"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.9-1/crypto-js.js"></script> <!-- Include CryptoJS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.9-1/crypto-js.js"></script>
     <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background-color: #f0f0f0;
+            font-family: Arial, sans-serif;
+            margin: 0;
+        }
+
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+
+        .description {
+            width: 80%;
+            max-width: 800px;
+            text-align: justify;
+            margin: 20px 0;
+            padding: 10px;
+            background-color: #ffffff;
+            border-radius: 5px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        #video {
+            width: 640px;
+            height: 480px;
+            border: 2px solid #4CAF50; /* Green border for the video */
+            border-radius: 5px;
+        }
+
         canvas {
             position: absolute;
             left: 0;
             top: 0;
+            border-radius: 5px;
         }
+
         video {
             position: absolute;
             left: 0;
             top: 0;
             transform: scaleX(-1); /* Mirror the video */
+            border-radius: 5px;
         }
     </style>
 </head>
 <body>
-    <video id="video" width="640" height="480" autoplay></video>
+    <h1>Face Detection and Authentication</h1>
+    <div class="description">
+        <p>
+            UIDAI is exploring possibilities to enable Face authentication on the desktop in a browser context. The proposed architecture to provide Face Authentication in the browser context requires AI on the edge to perform liveness checks of the face being captured by the webcam or connected camera. UIDAI is considering the injection of ML models using an appropriate binary code delivery mechanism. The security of these models is crucial for transaction integrity, and therefore an innovative solution is sought to protect the model from any tampering and reverse engineering.
+        </p>
+        <p>
+            As part of the challenge, participating teams are to demonstrate model security in a browser context using either obfuscation or cryptography. Models are typically 5~7MB in size and structured as flatbuffers. These models will be downloaded when first accessed on a desktop and then cached in the browser context. For subsequent face authentication transactions, a cached model is preferred unless the model has changed or updated. Teams are free to choose ONNX web runtime, Tensor.js, or any other innovative model to distribute the model in the browser context.
+        </p>
+        <p>
+            The expected outcome of this project is a functional solution that incorporates the security of the ML model at the edge. The backend for the proposed solution system must be designed to handle the high volume of transactions expected for any population-scale solutions.
+        </p>
+    </div>
+    <video id="video" autoplay></video>
     <canvas id="output"></canvas>
     <script src="script.js"></script>
 </body>
