@@ -28,42 +28,39 @@ async function setupCamera() {
 async function loadFaceMeshModel() {
     const model = await facemesh.load();
     console.log('Face Mesh model loaded');
+    // Example of how to encrypt some dummy model data
     const modelInfo = 'faceMeshModelInfo'; 
     const encryptedModelData = encryptData(modelInfo);
-    console.log('Encrypted Model Data:', encryptedModelData); 
+    console.log('Encrypted Model Data:', encryptedModelData); // show the encrypted data
     const decryptedModelInfo = decryptData(encryptedModelData);
-    console.log('Decrypted Model Info:', decryptedModelInfo); 
+    console.log('Decrypted Model Info:', decryptedModelInfo); // show the original data after decryption
     return model;
 }
 
 async function detectFaces(model) {
     const predictions = await model.estimateFaces(video);
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    
     predictions.forEach(prediction => {
         const topLeft = prediction.boundingBox.topLeft;
         const bottomRight = prediction.boundingBox.bottomRight;
 
-        // Adjusted bounding box size and position to fit the face accurately
-        const x = canvas.width - bottomRight[0]; // Directly use bottomRight for accurate position
-        const y = topLeft[1]; // Using topLeft for accurate vertical position
-        const width = bottomRight[0] - topLeft[0]; // Original width
-        const height = bottomRight[1] - topLeft[1]; // Original height
+        // Adjust these values to better fit the face
+        const x = canvas.width - bottomRight[0] * 0.95; // Reduced size by 5%
+        const y = topLeft[1] * 0.95; // Reduced size by 5%
+        const width = (bottomRight[0] - topLeft[0]) * 0.9; // Reduced size by 10%
+        const height = (bottomRight[1] - topLeft[1]) * 0.9; // Reduced size by 10%
 
         ctx.strokeStyle = 'red';
         ctx.lineWidth = 2;
         ctx.strokeRect(x, y, width, height);
-        
-        // Draw mesh points to fit better
         prediction.scaledMesh.forEach(point => {
-            const mirroredX = canvas.width - point[0]; 
-            const mirroredY = point[1];
+            const mirroredX = canvas.width - point[0] * 0.95; // Adjust to fit
+            const mirroredY = point[1] * 0.95; // Adjust to fit
 
             ctx.fillStyle = 'blue';
-            ctx.fillRect(mirroredX, mirroredY, 4, 4); // Adjusted point size for visibility
+            ctx.fillRect(mirroredX, mirroredY, 2, 2); 
         });
     });
-
     requestAnimationFrame(() => detectFaces(model));
 }
 
