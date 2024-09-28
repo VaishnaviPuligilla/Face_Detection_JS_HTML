@@ -13,9 +13,7 @@ function decryptData(encryptedData) {
 }
 
 async function setupCamera() {
-    const stream = await navigator.mediaDevices.getUserMedia({
-        video: true
-    });
+    const stream = await navigator.mediaDevices.getUserMedia({ video: true });
     video.srcObject = stream;
 
     return new Promise((resolve) => {
@@ -40,39 +38,45 @@ async function loadFaceMeshModel() {
 
 async function detectFaces(model) {
     const predictions = await model.estimateFaces(video);
-    
+
     ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear the canvas for each frame
-    predictions.forEach(prediction => {
-        const topLeft = prediction.boundingBox.topLeft;
-        const bottomRight = prediction.boundingBox.bottomRight;
-        
-        // Adjust for the mirrored video
-        const x = topLeft[0]; 
-        const y = topLeft[1];
-        const width = bottomRight[0] - topLeft[0];
-        const height = bottomRight[1] - topLeft[1];
-        
-        ctx.strokeStyle = 'red';
-        ctx.lineWidth = 2;
-        ctx.strokeRect(x, y, width, height);
-        
-        // Draw the keypoints
-        prediction.scaledMesh.forEach(point => {
-            ctx.fillStyle = 'blue';
-            ctx.fillRect(point[0], point[1], 2, 2); // Draw each keypoint
+
+    // Check if predictions are made
+    if (predictions.length > 0) {
+        predictions.forEach(prediction => {
+            const topLeft = prediction.boundingBox.topLeft;
+            const bottomRight = prediction.boundingBox.bottomRight;
+
+            // Use original coordinates since we are mirroring the video
+            const x = topLeft[0];
+            const y = topLeft[1];
+            const width = bottomRight[0] - topLeft[0];
+            const height = bottomRight[1] - topLeft[1];
+
+            ctx.strokeStyle = 'red';
+            ctx.lineWidth = 2;
+            ctx.strokeRect(x, y, width, height);
+
+            // Draw the keypoints
+            prediction.scaledMesh.forEach(point => {
+                ctx.fillStyle = 'blue';
+                ctx.fillRect(point[0], point[1], 2, 2); // Draw each keypoint
+            });
         });
-    });
-    
-    requestAnimationFrame(() => detectFaces(model));
+    }
+
+    requestAnimationFrame(() => detectFaces(model)); // Continue detecting faces
 }
 
 async function main() {
     await setupCamera();
-    
-    // Ensure the canvas dimensions match the video dimensions
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
-    
+
+    // Ensure the canvas dimensions match the video dimensions after metadata is loaded
+    video.onloadedmetadata = () => {
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+    };
+
     const model = await loadFaceMeshModel();
     detectFaces(model);
 }
