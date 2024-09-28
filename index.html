@@ -38,15 +38,17 @@
         /* Centering the video and canvas */
         .camera-container {
             position: relative;
-            width: 960px; /* Increased camera viewing width */
-            height: 720px; /* Increased camera viewing height */
+            width: 640px; /* Width of the square */
+            height: 640px; /* Height of the square */
             margin-bottom: 20px; /* Space below the video */
+            border: 2px solid #4CAF50; /* Green border for the camera container */
+            border-radius: 5px;
+            overflow: hidden; /* Ensure anything outside the square is hidden */
         }
 
         #video {
             width: 100%; /* Ensure the video fills the container */
             height: 100%;
-            border: 2px solid #4CAF50; /* Green border for the video */
             border-radius: 5px;
             display: block; /* Center the video */
         }
