@@ -28,15 +28,15 @@ async function setupCamera() {
 async function loadFaceMeshModel() {
     const model = await facemesh.load();
     console.log('Face Mesh model loaded');
-    
+
     // Example of how to encrypt some dummy model data
     const modelInfo = 'faceMeshModelInfo'; // Replace with actual model data if needed
     const encryptedModelData = encryptData(modelInfo);
-    console.log('Encrypted Model Data:', encryptedModelData);
+    console.log('Encrypted Model Data:', encryptedModelData); // This will show the encrypted data
 
     // Decrypt model data if you need to log it or use it
     const decryptedModelInfo = decryptData(encryptedModelData);
-    console.log('Decrypted Model Info:', decryptedModelInfo);
+    console.log('Decrypted Model Info:', decryptedModelInfo); // This will show the original data after decryption
     
     return model;
 }
