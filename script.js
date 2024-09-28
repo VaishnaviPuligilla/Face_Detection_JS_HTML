@@ -5,7 +5,7 @@ const ctx = canvasElement.getContext('2d');
 // Load the face detection model
 let model;
 async function loadModel() {
-    model = await faceDetection.SupportedModels.MediaPipeFaceDetection;
+    model = await faceDetection.createDetector(faceDetection.SupportedModels.MediaPipeFaceDetection);
     console.log("Model loaded.");
 }
 
@@ -21,6 +21,11 @@ async function setupWebcam() {
 }
 
 async function detectFaces() {
+    if (!model) {
+        console.error("Model not loaded yet.");
+        return;
+    }
+
     const predictions = await model.estimateFaces(videoElement);
 
     ctx.clearRect(0, 0, canvasElement.width, canvasElement.height); // Clear the canvas
@@ -31,8 +36,8 @@ async function detectFaces() {
 
     if (predictions.length > 0) {
         predictions.forEach(prediction => {
-            const start = prediction.boundingBox.topLeft;
-            const end = prediction.boundingBox.bottomRight;
+            const start = prediction.box.topLeft;
+            const end = prediction.box.bottomRight;
             const size = [end[0] - start[0], end[1] - start[1]];
 
             ctx.beginPath();
