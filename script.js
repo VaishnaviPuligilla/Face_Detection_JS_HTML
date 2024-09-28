@@ -1,1 +1,65 @@
-const _0x5940a1=_0xb497;(function(_0x5604d6,_0x4170d3){const _0x53a1ae=_0xb497,_0x41415c=_0x5604d6();while(!![]){try{const _0x3842f5=parseInt(_0x53a1ae(0x1d2))/0x1+-parseInt(_0x53a1ae(0x1de))/0x2*(-parseInt(_0x53a1ae(0x1c4))/0x3)+parseInt(_0x53a1ae(0x1e1))/0x4+-parseInt(_0x53a1ae(0x1cc))/0x5+parseInt(_0x53a1ae(0x1ce))/0x6+-parseInt(_0x53a1ae(0x1da))/0x7*(parseInt(_0x53a1ae(0x1df))/0x8)+parseInt(_0x53a1ae(0x1e2))/0x9*(-parseInt(_0x53a1ae(0x1d5))/0xa);if(_0x3842f5===_0x4170d3)break;else _0x41415c['push'](_0x41415c['shift']());}catch(_0xa4c75f){_0x41415c['push'](_0x41415c['shift']());}}}(_0x5b31,0xabd63));const video=document[_0x5940a1(0x1e6)](_0x5940a1(0x1dc)),canvas=document[_0x5940a1(0x1e6)](_0x5940a1(0x1d9)),ctx=canvas[_0x5940a1(0x1e5)]('2d');async function setupCamera(){const _0x2402b5=_0x5940a1,_0x5cd2a4=await navigator[_0x2402b5(0x1d3)]['getUserMedia']({'video':!![]});return video[_0x2402b5(0x1c8)]=_0x5cd2a4,new Promise(_0x5d24a6=>{const _0x900010=_0x2402b5;video[_0x900010(0x1db)]=()=>{_0x5d24a6(video);};});}function _0xb497(_0x2a0581,_0x23a0c4){const _0x5b3133=_0x5b31();return _0xb497=function(_0xb4978c,_0x581da8){_0xb4978c=_0xb4978c-0x1c4;let _0x30739a=_0x5b3133[_0xb4978c];return _0x30739a;},_0xb497(_0x2a0581,_0x23a0c4);}async function loadFaceMeshModel(){const _0x16e131=await facemesh['load']();return console['log']('Face\x20Mesh\x20model\x20loaded'),_0x16e131;}async function detectFaces(_0x419460){const _0x22df4f=_0x5940a1,_0x1010c0=await _0x419460[_0x22df4f(0x1cb)](video);ctx[_0x22df4f(0x1c5)](0x0,0x0,canvas[_0x22df4f(0x1d1)],canvas[_0x22df4f(0x1d4)]),_0x1010c0[_0x22df4f(0x1d8)](_0xdb1155=>{const _0x50056e=_0x22df4f,_0x438806=_0xdb1155[_0x50056e(0x1cf)][_0x50056e(0x1d7)],_0x565a51=_0xdb1155['boundingBox'][_0x50056e(0x1cd)],_0x524684=canvas['width']-_0x565a51[0x0],_0x599f62=_0x438806[0x1],_0x45f8de=_0x565a51[0x0]-_0x438806[0x0],_0x3359f2=_0x565a51[0x1]-_0x438806[0x1];ctx[_0x50056e(0x1d6)]=_0x50056e(0x1c6),ctx[_0x50056e(0x1e4)]=0x2,ctx[_0x50056e(0x1d0)](_0x524684,_0x599f62,_0x45f8de,_0x3359f2),_0xdb1155[_0x50056e(0x1e0)][_0x50056e(0x1d8)](_0x12cb85=>{const _0x206f3e=_0x50056e,_0x3d61f3=canvas[_0x206f3e(0x1d1)]-_0x12cb85[0x0],_0x5120bf=_0x12cb85[0x1];ctx[_0x206f3e(0x1c9)]=_0x206f3e(0x1c7),ctx[_0x206f3e(0x1e3)](_0x3d61f3,_0x5120bf,0x2,0x2);});}),requestAnimationFrame(()=>detectFaces(_0x419460));}function _0x5b31(){const _0x14f1ae=['bottomRight','788568hUchsl','boundingBox','strokeRect','width','1085288DsmLzO','mediaDevices','height','25970ISqbVn','strokeStyle','topLeft','forEach','output','35uWWolW','onloadedmetadata','video','videoWidth','98dKnrfC','101208iUHCPW','scaledMesh','3468368QagDer','3771yXntrT','fillRect','lineWidth','getContext','getElementById','71298UlOAwo','clearRect','red','blue','srcObject','fillStyle','videoHeight','estimateFaces','6965505ICxKCL'];_0x5b31=function(){return _0x14f1ae;};return _0x5b31();}async function main(){const _0x42c721=_0x5940a1;await setupCamera(),canvas['width']=video[_0x42c721(0x1dd)],canvas[_0x42c721(0x1d4)]=video[_0x42c721(0x1ca)];const _0x2f4b0d=await loadFaceMeshModel();detectFaces(_0x2f4b0d);}main();
+const video = document.getElementById('video');
+const canvas = document.getElementById('output');
+const ctx = canvas.getContext('2d');
+
+async function setupCamera() {
+    const stream = await navigator.mediaDevices.getUserMedia({
+        video: true
+    });
+    video.srcObject = stream;
+
+    return new Promise((resolve) => {
+        video.onloadedmetadata = () => {
+            resolve(video);
+        };
+    });
+}
+
+async function loadFaceMeshModel() {
+    const model = await facemesh.load();
+    console.log('Face Mesh model loaded');
+    return model;
+}
+
+async function detectFaces(model) {
+    const predictions = await model.estimateFaces(video);
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    predictions.forEach(prediction => {
+        const topLeft = prediction.boundingBox.topLeft;
+        const bottomRight = prediction.boundingBox.bottomRight;
+
+        // Calculate bounding box coordinates
+        const x = canvas.width - bottomRight[0]; // Adjust x for mirroring
+        const y = topLeft[1];
+        const width = bottomRight[0] - topLeft[0];
+        const height = bottomRight[1] - topLeft[1];
+
+        // Draw the bounding box
+        ctx.strokeStyle = 'red';
+        ctx.lineWidth = 2;
+        ctx.strokeRect(x, y, width, height);
+
+        // Draw key points on the face mesh with mirroring adjustment
+        prediction.scaledMesh.forEach(point => {
+            const mirroredX = canvas.width - point[0]; // Adjust x for mirroring
+            const mirroredY = point[1];
+
+            ctx.fillStyle = 'blue';
+            ctx.fillRect(mirroredX, mirroredY, 2, 2); // Draw points on the face mesh
+        });
+    });
+
+    requestAnimationFrame(() => detectFaces(model));
+}
+
+async function main() {
+    await setupCamera();
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    const model = await loadFaceMeshModel();
+    detectFaces(model);
+}
+
+main();
+
