@@ -7,12 +7,16 @@
     <script src="https://docs.opencv.org/4.x/opencv.js" async></script>
     <style>
         video {
-            display: none; /* Hide video element */
+            width: 640px; /* Set a width for the video */
+            height: auto;
+            display: block; /* Ensure the video is visible */
+            border: 1px solid black;
         }
         canvas {
             position: absolute;
             top: 0;
             left: 0;
+            border: 1px solid red; /* Optional: Add a border to the canvas */
         }
     </style>
 </head>
