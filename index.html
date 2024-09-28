@@ -6,33 +6,12 @@
     <title>Face Detection</title>
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/facemesh"></script>
-    <style>
-        body {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            background-color: #f0f0f0;
-        }
-
-        video {
-            border: 2px solid #000;
-            width: 600px;
-            height: 400px;
-        }
-
-        canvas {
-            position: absolute;
-            top: 0;
-            left: 0;
-            border: 2px solid red; /* Optional: Box color */
-        }
-    </style>
 </head>
 <body>
-    <video id="webcam" autoplay playsinline></video>
-    <canvas id="canvas" width="600" height="400"></canvas>
+    <h1>Face Detection with TensorFlow.js</h1>
+    <video id="webcam" autoplay></video>
+    <canvas id="output" style="position: absolute;"></canvas>
+
     <script src="script.js"></script>
 </body>
 </html>
