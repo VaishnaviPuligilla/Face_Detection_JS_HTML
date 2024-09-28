@@ -26,14 +26,21 @@ async function detectFaces(model) {
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     predictions.forEach(prediction => {
-        const x = canvas.width - prediction.boundingBox.bottomRight[0]; // Invert x coordinate
+        const x = canvas.width - prediction.boundingBox.bottomRight[0]; // Adjust x coordinate
         const y = prediction.boundingBox.topLeft[1];
         const width = prediction.boundingBox.bottomRight[0] - prediction.boundingBox.topLeft[0];
         const height = prediction.boundingBox.bottomRight[1] - prediction.boundingBox.topLeft[1];
 
+        // Draw the bounding box
         ctx.strokeStyle = 'red';
         ctx.lineWidth = 2;
-        ctx.strokeRect(x - width, y, width, height); // Adjust x position
+        ctx.strokeRect(x - width, y, width, height);
+
+        // Optionally, draw key points
+        prediction.scaledMesh.forEach(point => {
+            ctx.fillStyle = 'blue';
+            ctx.fillRect(point[0], point[1], 2, 2); // Draw points on the face mesh
+        });
     });
 
     requestAnimationFrame(() => detectFaces(model));
