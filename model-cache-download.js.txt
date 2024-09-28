@@ -1,0 +1,11 @@
+// model-cache-download.js
+async function downloadAndStoreModel(modelUrl) {
+    const response = await fetch(modelUrl);
+    const model = await response.arrayBuffer(); // Fetching as binary data
+
+    const transaction = db.transaction(storeName, "readwrite");
+    const store = transaction.objectStore(storeName);
+    store.put(model, "model"); // Storing the model
+
+    console.log("Model downloaded and stored successfully");
+}

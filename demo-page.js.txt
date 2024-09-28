@@ -1,0 +1,11 @@
+// demo-page.js
+async function runDemo() {
+    const modelUrl = "D:/face-authentication/script.js"; // Correct URL format for your model
+    await initializeModel(modelUrl);
+    
+    // Implement your demo functionality
+    console.log("Demo is running..."); 
+}
+
+// Call runDemo when the page loads
+document.addEventListener("DOMContentLoaded", runDemo);
