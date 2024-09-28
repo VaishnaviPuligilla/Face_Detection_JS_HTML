@@ -3,9 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Face Authentication</title>
-    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
-<script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/facemesh"></script>
+    <title>Face Detection</title>
     <style>
         body {
             display: flex;
@@ -15,7 +13,6 @@
             height: 100vh;
             background-color: #f0f0f0;
         }
-
         video {
             border: 2px solid #000;
             width: 600px;
@@ -24,8 +21,9 @@
     </style>
 </head>
 <body>
-    <h1>Face Authentication</h1>
-    <video id="webcam" autoplay playsinline></video>
+    <video id="webcam" autoplay></video>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/facemesh"></script>
     <script src="script.js"></script>
 </body>
 </html>
