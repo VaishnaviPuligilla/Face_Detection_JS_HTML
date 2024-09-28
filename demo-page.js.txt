@@ -1,11 +1,1 @@
-// demo-page.js
-async function runDemo() {
-    const modelUrl = "D:/face-authentication/script.js"; // Update this URL as needed
-    await initializeModel(modelUrl);
-    
-    // Start the camera and detect faces
-    await main();
-}
 
-// Call runDemo when the page loads
-document.addEventListener("DOMContentLoaded", runDemo);
