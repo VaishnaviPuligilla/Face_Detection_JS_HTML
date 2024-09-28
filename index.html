@@ -5,26 +5,24 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Face Detection with TensorFlow.js</title>
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/face-detection"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/facemesh"></script>
     <style>
-        video {
-            width: 640px; /* Set a width for the video */
-            height: auto;
-            border: 1px solid black;
-        }
         canvas {
             position: absolute;
-            top: 0;
             left: 0;
-            border: 1px solid red; /* Optional: Add a border to the canvas */
+            top: 0;
+        }
+        video {
+            position: absolute;
+            left: 0;
+            top: 0;
+            transform: scaleX(-1); /* Mirror the video */
         }
     </style>
 </head>
 <body>
-    <h1>Face Detection with TensorFlow.js</h1>
-    <video id="webcam" autoplay></video>
+    <video id="video" width="640" height="480" autoplay></video>
     <canvas id="output"></canvas>
-
     <script src="script.js"></script>
 </body>
 </html>
