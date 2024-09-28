@@ -40,10 +40,13 @@ async function detectFaces(model) {
         ctx.lineWidth = 2;
         ctx.strokeRect(x, y, width, height);
 
-        // Draw key points on the face mesh
+        // Draw key points on the face mesh with mirroring adjustment
         prediction.scaledMesh.forEach(point => {
+            const mirroredX = canvas.width - point[0]; // Adjust x for mirroring
+            const mirroredY = point[1];
+
             ctx.fillStyle = 'blue';
-            ctx.fillRect(point[0], point[1], 2, 2); // Draw points on the face mesh
+            ctx.fillRect(mirroredX, mirroredY, 2, 2); // Draw points on the face mesh
         });
     });
 
