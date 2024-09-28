@@ -1,13 +1,8 @@
-let facemesh;
-
-async function loadFaceMeshModel() {
-    facemesh = await facemesh.load(); // Load the Face Mesh model
-    console.log("Face Mesh Model Loaded");
-}
-
 async function setupWebcam() {
     const webcamElement = document.getElementById('webcam');
-    const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+    const stream = await navigator.mediaDevices.getUserMedia({
+        video: true
+    });
     webcamElement.srcObject = stream;
 
     return new Promise((resolve) => {
@@ -17,48 +12,37 @@ async function setupWebcam() {
     });
 }
 
-async function detectFace() {
+async function loadFaceMeshModel() {
+    const model = await facemesh.load();
+    console.log("Face Mesh Model Loaded");
+    detectFace(model);
+}
+
+async function detectFace(model) {
     const webcamElement = document.getElementById('webcam');
-    const canvas = document.getElementById('canvas');
-    const ctx = canvas.getContext('2d');
+    const canvasElement = document.getElementById('canvas');
+    const ctx = canvasElement.getContext('2d');
 
-    // Estimate faces from the webcam feed
-    const predictions = await facemesh.estimateFaces(webcamElement);
+    const predictions = await model.estimateFaces(webcamElement);
 
-    // Clear the canvas
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.clearRect(0, 0, canvasElement.width, canvasElement.height); // Clear the canvas before drawing
 
-    // Check if any faces are detected
     if (predictions.length > 0) {
         console.log("Face detected:", predictions);
-
         predictions.forEach(prediction => {
-            const topLeft = prediction.boundingBox.topLeft;
-            const bottomRight = prediction.boundingBox.bottomRight;
-
-            // Draw bounding box
+            const { topLeft, bottomRight } = prediction.boundingBox; // Get bounding box coordinates
             ctx.beginPath();
             ctx.rect(topLeft[0], topLeft[1], bottomRight[0] - topLeft[0], bottomRight[1] - topLeft[1]);
             ctx.lineWidth = 2;
-            ctx.strokeStyle = 'green'; // Color of the bounding box
+            ctx.strokeStyle = 'red'; // Box color
             ctx.stroke();
-
-            // Optional: Display additional info (e.g., confidence)
-            ctx.font = '16px Arial';
-            ctx.fillStyle = 'green';
-            ctx.fillText(`Confidence: ${(prediction.score * 100).toFixed(2)}%`, topLeft[0], topLeft[1] > 10 ? topLeft[1] - 5 : 10);
         });
-    } else {
-        console.log("No face detected.");
     }
 
-    // Repeat detection
-    requestAnimationFrame(detectFace);
+    requestAnimationFrame(() => detectFace(model));
 }
 
-// Start the process
-document.addEventListener('DOMContentLoaded', async (event) => {
-    await loadFaceMeshModel();
+document.addEventListener('DOMContentLoaded', async () => {
     await setupWebcam();
-    detectFace(); // Start detecting faces
+    await loadFaceMeshModel();
 });
