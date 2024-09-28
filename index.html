@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Face Detection</title>
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/facemesh"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/face-detection"></script>
     <style>
         body {
             display: flex;
@@ -20,12 +20,20 @@
             border: 2px solid #000;
             width: 600px;
             height: 400px;
+            position: absolute; /* Make sure video is on the same position as canvas */
+        }
+
+        canvas {
+            position: absolute; /* Overlay the canvas on the video */
+            left: 0;
+            top: 0;
+            pointer-events: none; /* Prevent mouse events on the canvas */
         }
     </style>
 </head>
 <body>
-    <h1>Face Detection with TensorFlow.js</h1>
-    <video id="webcam" autoplay playsinline></video>
+    <video id="webcam" autoplay></video>
+    <canvas id="canvas" width="600" height="400"></canvas>
     <script src="script.js"></script>
 </body>
 </html>
