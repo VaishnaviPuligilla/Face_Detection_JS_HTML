@@ -15,9 +15,29 @@ async function setupCamera() {
     });
 }
 
+// Encrypt the model data (dummy example as model is not usually raw data)
+function encryptData(data) {
+    return CryptoJS.AES.encrypt(data, 'secret key 123').toString();
+}
+
+// Decrypt the model data (dummy example)
+function decryptData(encryptedData) {
+    return CryptoJS.AES.decrypt(encryptedData, 'secret key 123').toString(CryptoJS.enc.Utf8);
+}
+
 async function loadFaceMeshModel() {
     const model = await facemesh.load();
     console.log('Face Mesh model loaded');
+
+    // Encrypt the model info or data (if applicable)
+    const modelInfo = JSON.stringify(model); // Example, model itself isn't stringified this way
+    const encryptedModelData = encryptData(modelInfo);
+    console.log('Encrypted Model Data:', encryptedModelData);
+    
+    // Decrypt model info (if needed, use this step before using model)
+    const decryptedModelInfo = decryptData(encryptedModelData);
+    console.log('Decrypted Model Info:', decryptedModelInfo);
+
     return model;
 }
 
@@ -62,4 +82,3 @@ async function main() {
 }
 
 main();
-
