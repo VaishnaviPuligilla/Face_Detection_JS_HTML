@@ -1,58 +1,50 @@
-const videoElement = document.getElementById('webcam');
-const canvasElement = document.getElementById('output');
-const ctx = canvasElement.getContext('2d');
+const video = document.getElementById('video');
+const canvas = document.getElementById('output');
+const ctx = canvas.getContext('2d');
 
-// Load the face detection model
-let model;
-async function loadModel() {
-    model = await faceDetection.createDetector(faceDetection.SupportedModels.MediaPipeFaceDetection);
-    console.log("Model loaded.");
-}
-
-async function setupWebcam() {
-    const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-    videoElement.srcObject = stream;
+async function setupCamera() {
+    const stream = await navigator.mediaDevices.getUserMedia({
+        video: true
+    });
+    video.srcObject = stream;
 
     return new Promise((resolve) => {
-        videoElement.onloadedmetadata = () => {
-            resolve(videoElement);
+        video.onloadedmetadata = () => {
+            resolve(video);
         };
     });
 }
 
-async function detectFaces() {
-    if (!model) {
-        console.error("Model not loaded yet.");
-        return;
-    }
-
-    const predictions = await model.estimateFaces(videoElement);
-
-    ctx.clearRect(0, 0, canvasElement.width, canvasElement.height); // Clear the canvas
-    canvasElement.width = videoElement.videoWidth;
-    canvasElement.height = videoElement.videoHeight;
-
-    ctx.drawImage(videoElement, 0, 0, canvasElement.width, canvasElement.height);
-
-    if (predictions.length > 0) {
-        predictions.forEach(prediction => {
-            const start = prediction.box.topLeft;
-            const end = prediction.box.bottomRight;
-            const size = [end[0] - start[0], end[1] - start[1]];
-
-            ctx.beginPath();
-            ctx.rect(start[0], start[1], size[0], size[1]);
-            ctx.lineWidth = 2;
-            ctx.strokeStyle = 'green';
-            ctx.stroke();
-        });
-    }
-
-    requestAnimationFrame(detectFaces);
+async function loadFaceMeshModel() {
+    const model = await facemesh.load();
+    console.log('Face Mesh model loaded');
+    return model;
 }
 
-document.addEventListener('DOMContentLoaded', async () => {
-    await loadModel();
-    await setupWebcam();
-    detectFaces();
-});
+async function detectFaces(model) {
+    const predictions = await model.estimateFaces(video);
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    predictions.forEach(prediction => {
+        const x = prediction.boundingBox.topLeft[0];
+        const y = prediction.boundingBox.topLeft[1];
+        const width = prediction.boundingBox.bottomRight[0] - x;
+        const height = prediction.boundingBox.bottomRight[1] - y;
+
+        ctx.strokeStyle = 'red';
+        ctx.lineWidth = 2;
+        ctx.strokeRect(x, y, width, height);
+    });
+
+    requestAnimationFrame(() => detectFaces(model));
+}
+
+async function main() {
+    await setupCamera();
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    const model = await loadFaceMeshModel();
+    detectFaces(model);
+}
+
+main();
