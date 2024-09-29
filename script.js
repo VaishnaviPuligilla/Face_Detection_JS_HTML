@@ -1,7 +1,10 @@
 const video = document.getElementById('video');
 const canvas = document.getElementById('output');
 const ctx = canvas.getContext('2d');
+
+let lastPredictions = [];
 let staticImageDetected = false;
+const staticImageThreshold = 10; // Number of frames to confirm a static image
 
 async function setupCamera() {
     const stream = await navigator.mediaDevices.getUserMedia({
@@ -24,10 +27,13 @@ async function loadFaceMeshModel() {
 
 async function detectFaces(model) {
     const predictions = await model.estimateFaces(video);
-
     ctx.clearRect(0, 0, canvas.width, canvas.height);
+
     if (predictions.length > 0) {
         staticImageDetected = false; // Reset the flag if a face is detected
+        lastPredictions.push(predictions); // Store current predictions for comparison
+
+        // Draw predictions
         predictions.forEach(prediction => {
             const topLeft = prediction.boundingBox.topLeft;
             const bottomRight = prediction.boundingBox.bottomRight;
@@ -52,12 +58,34 @@ async function detectFaces(model) {
                 ctx.fillRect(mirroredX, mirroredY, 2, 2); // Draw points on the face mesh
             });
         });
+
+        // Check for static image detection
+        if (lastPredictions.length > staticImageThreshold) {
+            const isStatic = lastPredictions.slice(-staticImageThreshold).every(pred => {
+                return pred.length === predictions.length &&
+                       pred.every((p, index) => {
+                           return p.boundingBox.topLeft[0] === predictions[index].boundingBox.topLeft[0] &&
+                                  p.boundingBox.topLeft[1] === predictions[index].boundingBox.topLeft[1];
+                       });
+            });
+
+            if (isStatic && !staticImageDetected) {
+                alert('Static image detected!'); // Alert if static image is detected
+                staticImageDetected = true; // Set the flag to avoid repeated alerts
+            }
+        }
+
     } else {
         // If no face is detected
         if (!staticImageDetected) {
-            alert('Static image detected!'); // Alert if no live face is detected
+            alert('No face detected!'); // Alert if no live face is detected
             staticImageDetected = true; // Set the flag to avoid repeated alerts
         }
+    }
+
+    // Keep only the last N predictions
+    if (lastPredictions.length > staticImageThreshold) {
+        lastPredictions.shift();
     }
 
     requestAnimationFrame(() => detectFaces(model));
