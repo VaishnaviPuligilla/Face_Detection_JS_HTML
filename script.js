@@ -45,7 +45,6 @@ function isLiveFace(prediction) {
     const LEFT_EYE = [33, 133, 160, 158, 153, 144]; // Example points for left eye
     const RIGHT_EYE = [362, 263, 387, 385, 380, 373]; // Example points for right eye
 
-    // Calculate eye openness based on the distance between eyelid landmarks
     const leftEyeOpen = prediction.scaledMesh[LEFT_EYE[0]][1] - prediction.scaledMesh[LEFT_EYE[3]][1];
     const rightEyeOpen = prediction.scaledMesh[RIGHT_EYE[0]][1] - prediction.scaledMesh[RIGHT_EYE[3]][1];
 
@@ -58,7 +57,6 @@ function isLiveFace(prediction) {
 
     lastEyeOpenState = isEyeOpen;
 
-    // Simple condition to detect if the person is blinking enough to be considered alive
     return blinkCount >= blinkThreshold; // Return true if alive (enough blinks)
 }
 
@@ -67,13 +65,10 @@ async function detectFaces(model) {
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.save();
-    ctx.scale(-1, 1);
-    ctx.translate(-canvas.width, 0);
+    ctx.scale(-1, 1); // Mirror the canvas horizontally
+    ctx.translate(-canvas.width, 0); // Adjust position after mirroring
 
-    if (predictions.length === 0) {
-        alert("Face not visible");
-    } else if (predictions.length > 0) {
-        // Process the first detected face
+    if (predictions.length > 0) {
         const prediction = predictions[0];
 
         // Check for liveness
@@ -91,21 +86,26 @@ async function detectFaces(model) {
         const width = (bottomRight[0] - topLeft[0]) * adjustmentFactor;
         const height = (bottomRight[1] - topLeft[1]) * adjustmentFactor;
 
+        // Draw bounding box
         ctx.strokeStyle = 'red';
         ctx.lineWidth = 2;
         ctx.strokeRect(x, y, width, height);
 
+        // Draw mesh points
         const horizontalScalingFactor = 0.7; 
 
         prediction.scaledMesh.forEach(point => {
-            const pointX = (point[0] - x) * horizontalScalingFactor + x;
+            const pointX = (point[0] - x) * horizontalScalingFactor + x; // Adjust only horizontal
             const pointY = point[1];
 
+            // Ensure points are within bounding box
             if (pointX >= x && pointX <= x + width && pointY >= y && pointY <= y + height) {
                 ctx.fillStyle = 'blue';
                 ctx.fillRect(pointX, pointY, 2, 2);
             }
         });
+    } else {
+        alert("Face not visible");
     }
 
     ctx.restore(); 
