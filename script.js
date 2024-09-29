@@ -2,89 +2,79 @@ const video = document.getElementById('video');
 const canvas = document.getElementById('output');
 const ctx = canvas.getContext('2d');
 
-// Encrypt model data
-function encryptData(data) {
-    return CryptoJS.AES.encrypt(data, 'secret key 123').toString();
-}
-
-// Decrypt model data
-function decryptData(encryptedData) {
-    const bytes = CryptoJS.AES.decrypt(encryptedData, 'secret key 123');
-    return bytes.toString(CryptoJS.enc.Utf8);
-}
-
+// Function to set up the camera
 async function setupCamera() {
-    try {
-        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-        video.srcObject = stream;
+    const stream = await navigator.mediaDevices.getUserMedia({
+        video: true
+    });
+    video.srcObject = stream;
 
-        return new Promise((resolve) => {
-            video.onloadedmetadata = () => {
-                resolve(video);
-            };
-        });
-    } catch (err) {
-        console.error('Error accessing camera: ', err);
-    }
+    return new Promise((resolve) => {
+        video.onloadedmetadata = () => {
+            resolve(video);
+        };
+    });
 }
 
+// Load the FaceMesh model
 async function loadFaceMeshModel() {
     const model = await facemesh.load();
     console.log('Face Mesh model loaded');
-    
-    // Example of how to encrypt some dummy model data
-    const modelInfo = 'faceMeshModelInfo'; 
-    const encryptedModelData = encryptData(modelInfo);
-    console.log('Encrypted Model Data:', encryptedModelData); // show the encrypted data
-    const decryptedModelInfo = decryptData(encryptedModelData);
-    console.log('Decrypted Model Info:', decryptedModelInfo); // show the original data after decryption
     return model;
 }
 
-// Detect faces in live video
-async function detectFacesLive(model) {
-    const predictions = await model.estimateFaces(video);
+// Detect faces in live video or static image
+async function detectFaces(model) {
+    let predictions;
 
-    // Clear the canvas and apply mirroring transformation
+    // Check if video is playing and get predictions
+    if (!video.paused) {
+        predictions = await model.estimateFaces(video);
+        console.log("Live video detected");
+    } else {
+        // When a static image is provided, display it and get predictions
+        const staticImage = document.getElementById('static-image'); // Ensure you have a static image element in your HTML
+        ctx.drawImage(staticImage, 0, 0, canvas.width, canvas.height);
+        predictions = await model.estimateFaces(staticImage);
+        console.log("Static image detected");
+    }
+
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.save();
-    ctx.scale(-1, 1); // Mirror the canvas horizontally
-    ctx.translate(-canvas.width, 0); // Adjust position after mirroring
-
     predictions.forEach(prediction => {
         const topLeft = prediction.boundingBox.topLeft;
         const bottomRight = prediction.boundingBox.bottomRight;
 
-        // Draw bounding box
+        // Calculate bounding box coordinates
+        const x = canvas.width - bottomRight[0]; // Adjust x for mirroring
+        const y = topLeft[1];
+        const width = bottomRight[0] - topLeft[0];
+        const height = bottomRight[1] - topLeft[1];
+
+        // Draw the bounding box
         ctx.strokeStyle = 'red';
         ctx.lineWidth = 2;
-        ctx.strokeRect(topLeft[0], topLeft[1], bottomRight[0] - topLeft[0], bottomRight[1] - topLeft[1]);
+        ctx.strokeRect(x, y, width, height);
 
-        // Draw mesh points
+        // Draw key points on the face mesh with mirroring adjustment
         prediction.scaledMesh.forEach(point => {
+            const mirroredX = canvas.width - point[0]; // Adjust x for mirroring
+            const mirroredY = point[1];
+
             ctx.fillStyle = 'blue';
-            ctx.fillRect(point[0], point[1], 2, 2); // Draw each point of the mesh
+            ctx.fillRect(mirroredX, mirroredY, 2, 2); // Draw points on the face mesh
         });
     });
 
-    ctx.restore(); // Restore the canvas to remove the mirroring effect for the next frame
-
-    requestAnimationFrame(() => detectFacesLive(model));
+    requestAnimationFrame(() => detectFaces(model));
 }
 
 async function main() {
-    // Load model
-    const model = await loadFaceMeshModel();
-
-    // Setup video camera
     await setupCamera();
-
-    // Adjust canvas size
     canvas.width = video.videoWidth;
     canvas.height = video.videoHeight;
-
-    // Detect faces in live video
-    detectFacesLive(model);
+    const model = await loadFaceMeshModel();
+    detectFaces(model);
 }
 
+// Run the main function
 main();
