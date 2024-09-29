@@ -28,6 +28,12 @@ async function setupCamera() {
 async function loadFaceMeshModel() {
     const model = await facemesh.load();
     console.log('Face Mesh model loaded');
+    // Example of how to encrypt some dummy model data
+    const modelInfo = 'faceMeshModelInfo'; 
+    const encryptedModelData = encryptData(modelInfo);
+    console.log('Encrypted Model Data:', encryptedModelData); // show the encrypted data
+    const decryptedModelInfo = decryptData(encryptedModelData);
+    console.log('Decrypted Model Info:', decryptedModelInfo); // show the original data after decryption
     return model;
 }
 
@@ -44,8 +50,8 @@ async function detectFaces(model) {
         const topLeft = prediction.boundingBox.topLeft;
         const bottomRight = prediction.boundingBox.bottomRight;
 
-        // Use a slight adjustment factor or none at all for a more natural fit
-        const adjustmentFactor = 0.95; // Reduce the bounding box size by 5% to make it slightly smaller
+        // Adjust bounding box values
+        const adjustmentFactor = 0.85; // Reduce the bounding box size by 15%
         const x = topLeft[0] + (1 - adjustmentFactor) * (bottomRight[0] - topLeft[0]) / 2;
         const y = topLeft[1] + (1 - adjustmentFactor) * (bottomRight[1] - topLeft[1]) / 2;
         const width = (bottomRight[0] - topLeft[0]) * adjustmentFactor;
@@ -56,14 +62,19 @@ async function detectFaces(model) {
         ctx.lineWidth = 2;
         ctx.strokeRect(x, y, width, height);
 
-        // Draw mesh points without aggressive scaling adjustments
+        // Set a horizontal scaling factor to reduce width of the mesh
+        const horizontalScalingFactor = 0.7; // Scale horizontal size down to 70%
+
+        // Draw mesh points with adjusted horizontal scaling
         prediction.scaledMesh.forEach(point => {
-            const pointX = point[0];
+            const pointX = (point[0] - x) * horizontalScalingFactor + x; // Adjust only horizontal
             const pointY = point[1];
 
-            // Draw the mesh points normally without reducing their positions
-            ctx.fillStyle = 'blue';
-            ctx.fillRect(pointX, pointY, 2, 2);
+            // Ensure points are within bounding box
+            if (pointX >= x && pointX <= x + width && pointY >= y && pointY <= y + height) {
+                ctx.fillStyle = 'blue';
+                ctx.fillRect(pointX, pointY, 2, 2);
+            }
         });
     });
 
