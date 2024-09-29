@@ -3,50 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Full-Page Camera View</title>
+    <title>Face Detection</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.9-1/crypto-js.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/facemesh"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.9-1/crypto-js.js"></script>
     <style>
-        body, html {
-            margin: 0;
-            padding: 0;
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-        }
-
-        .camera-container {
-            position: fixed; /* Covers the full screen */
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            border: 5px solid #4CAF50; /* Green border for the camera view */
-            overflow: hidden;
-        }
-
-        video {
-            width: 100%;
-            height: 100%;
-            transform: scaleX(-1); /* Mirror the video */
-            display: block;
-        }
-
-        canvas {
+        #output {
             position: absolute;
-            left: 0;
             top: 0;
-            width: 100%;
-            height: 100%;
+            left: 0;
         }
     </style>
 </head>
 <body>
-    <div class="camera-container">
-        <video id="video" autoplay></video>
-        <canvas id="output"></canvas>
-    </div>
-    <script src="script.js"></script>
+    <video id="video" autoplay style="display:none;"></video> <!-- Hidden video element for live detection -->
+    <canvas id="output"></canvas>
+    <script src="your_script.js"></script>
 </body>
 </html>
