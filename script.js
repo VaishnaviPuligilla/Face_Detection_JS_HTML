@@ -6,13 +6,12 @@ async function setupCamera() {
     try {
         const stream = await navigator.mediaDevices.getUserMedia({ video: true });
         video.srcObject = stream;
-        return new Promise((resolve) => {
-            video.onloadedmetadata = () => {
-                resolve(video);
-            };
-        });
+        video.onloadedmetadata = () => {
+            video.play();
+        };
     } catch (error) {
         console.error('Error accessing the camera: ', error);
+        alert('Could not access the camera. Please check your browser permissions.');
     }
 }
 
