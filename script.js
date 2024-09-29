@@ -28,59 +28,30 @@ async function setupCamera() {
 async function loadFaceMeshModel() {
     const model = await facemesh.load();
     console.log('Face Mesh model loaded');
+    // Example of how to encrypt some dummy model data
     const modelInfo = 'faceMeshModelInfo'; 
     const encryptedModelData = encryptData(modelInfo);
-    console.log('Encrypted Model Data:', encryptedModelData);
+    console.log('Encrypted Model Data:', encryptedModelData); // show the encrypted data
     const decryptedModelInfo = decryptData(encryptedModelData);
-    console.log('Decrypted Model Info:', decryptedModelInfo);
+    console.log('Decrypted Model Info:', decryptedModelInfo); // show the original data after decryption
     return model;
-}
-
-// Function to check if the detected face is a live face
-let blinkCount = 0;
-let blinkThreshold = 5; // Number of frames to count as a blink
-let lastEyeOpenState = true; // Assume eyes are initially open
-
-function isLiveFace(prediction) {
-    const LEFT_EYE = [33, 133, 160, 158, 153, 144]; // Example points for left eye
-    const RIGHT_EYE = [362, 263, 387, 385, 380, 373]; // Example points for right eye
-
-    const leftEyeOpen = prediction.scaledMesh[LEFT_EYE[0]][1] - prediction.scaledMesh[LEFT_EYE[3]][1];
-    const rightEyeOpen = prediction.scaledMesh[RIGHT_EYE[0]][1] - prediction.scaledMesh[RIGHT_EYE[3]][1];
-
-    const isEyeOpen = leftEyeOpen > 0 && rightEyeOpen > 0;
-
-    // Check for blink
-    if (!isEyeOpen && lastEyeOpenState) {
-        blinkCount++;
-    }
-
-    lastEyeOpenState = isEyeOpen;
-
-    return blinkCount >= blinkThreshold; // Return true if alive (enough blinks)
 }
 
 async function detectFaces(model) {
     const predictions = await model.estimateFaces(video);
 
+    // Clear the canvas and apply mirroring transformation
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.save();
     ctx.scale(-1, 1); // Mirror the canvas horizontally
     ctx.translate(-canvas.width, 0); // Adjust position after mirroring
 
-    if (predictions.length > 0) {
-        const prediction = predictions[0];
-
-        // Check for liveness
-        if (!isLiveFace(prediction)) {
-            alert("Face not visible (static image detected)");
-            return;
-        }
-
+    predictions.forEach(prediction => {
         const topLeft = prediction.boundingBox.topLeft;
         const bottomRight = prediction.boundingBox.bottomRight;
 
-        const adjustmentFactor = 0.85; 
+        // Adjust bounding box values
+        const adjustmentFactor = 0.85; // Reduce the bounding box size by 15%
         const x = topLeft[0] + (1 - adjustmentFactor) * (bottomRight[0] - topLeft[0]) / 2;
         const y = topLeft[1] + (1 - adjustmentFactor) * (bottomRight[1] - topLeft[1]) / 2;
         const width = (bottomRight[0] - topLeft[0]) * adjustmentFactor;
@@ -91,9 +62,10 @@ async function detectFaces(model) {
         ctx.lineWidth = 2;
         ctx.strokeRect(x, y, width, height);
 
-        // Draw mesh points
-        const horizontalScalingFactor = 0.7; 
+        // Set a horizontal scaling factor to reduce width of the mesh
+        const horizontalScalingFactor = 0.7; // Scale horizontal size down to 70%
 
+        // Draw mesh points with adjusted horizontal scaling
         prediction.scaledMesh.forEach(point => {
             const pointX = (point[0] - x) * horizontalScalingFactor + x; // Adjust only horizontal
             const pointY = point[1];
@@ -104,11 +76,10 @@ async function detectFaces(model) {
                 ctx.fillRect(pointX, pointY, 2, 2);
             }
         });
-    } else {
-        alert("Face not visible");
-    }
+    });
 
-    ctx.restore(); 
+    ctx.restore(); // Restore the canvas to remove the mirroring effect for the next frame
+
     requestAnimationFrame(() => detectFaces(model));
 }
 
