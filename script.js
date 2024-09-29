@@ -1,3 +1,6 @@
+// Import CryptoJS for encryption
+const CryptoJS = require('crypto-js');
+
 const video = document.getElementById('video');
 const canvas = document.getElementById('output');
 const ctx = canvas.getContext('2d');
@@ -9,9 +12,22 @@ function encryptData(data) {
 
 // Decrypt model data
 function decryptData(encryptedData) {
-    return CryptoJS.AES.decrypt(encryptedData, 'secret key 123').toString(CryptoJS.enc.Utf8);
+    const bytes = CryptoJS.AES.decrypt(encryptedData, 'secret key 123');
+    return bytes.toString(CryptoJS.enc.Utf8);
 }
 
+// Encrypt input image data (example function)
+function encryptImageData(imageData) {
+    return CryptoJS.AES.encrypt(imageData, 'image secret key').toString();
+}
+
+// Decrypt input image data
+function decryptImageData(encryptedImageData) {
+    const bytes = CryptoJS.AES.decrypt(encryptedImageData, 'image secret key');
+    return bytes.toString(CryptoJS.enc.Utf8);
+}
+
+// Setup camera for video input
 async function setupCamera() {
     const stream = await navigator.mediaDevices.getUserMedia({
         video: true
@@ -25,18 +41,24 @@ async function setupCamera() {
     });
 }
 
+// Load the Face Mesh model
 async function loadFaceMeshModel() {
     const model = await facemesh.load();
     console.log('Face Mesh model loaded');
-    // Example of how to encrypt some dummy model data
+
+    // Example of encrypting model data
     const modelInfo = 'faceMeshModelInfo'; 
     const encryptedModelData = encryptData(modelInfo);
-    console.log('Encrypted Model Data:', encryptedModelData); // show the encrypted data
+    console.log('Encrypted Model Data:', encryptedModelData); // Show the encrypted model data
+    
+    // Show the decrypted model data for verification
     const decryptedModelInfo = decryptData(encryptedModelData);
-    console.log('Decrypted Model Info:', decryptedModelInfo); // show the original data after decryption
+    console.log('Decrypted Model Info:', decryptedModelInfo); // Show the original data after decryption
+    
     return model;
 }
 
+// Detect faces and display them on canvas
 async function detectFaces(model) {
     const predictions = await model.estimateFaces(video);
 
@@ -83,6 +105,7 @@ async function detectFaces(model) {
     requestAnimationFrame(() => detectFaces(model));
 }
 
+// Main function to run the video and model detection
 async function main() {
     await setupCamera();
     canvas.width = video.videoWidth;
@@ -91,4 +114,5 @@ async function main() {
     detectFaces(model);
 }
 
+// Start the application
 main();
