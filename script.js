@@ -28,18 +28,17 @@ async function setupCamera() {
 async function loadFaceMeshModel() {
     const model = await facemesh.load();
     console.log('Face Mesh model loaded');
-    // Example of how to encrypt some dummy model data
-    const modelInfo = 'faceMeshModelInfo';
-    const encryptedModelData = encryptData(modelInfo);
-    console.log('Encrypted Model Data:', encryptedModelData); // show the encrypted data
-    const decryptedModelInfo = decryptData(encryptedModelData);
-    console.log('Decrypted Model Info:', decryptedModelInfo); // show the original data after decryption
     return model;
 }
 
 async function detectFaces(model) {
     const predictions = await model.estimateFaces(video);
+    
+    // Clear the canvas and apply mirroring transformation
     ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.save();
+    ctx.scale(-1, 1); // Mirror the canvas horizontally
+    ctx.translate(-canvas.width, 0); // Adjust position after mirroring
 
     predictions.forEach(prediction => {
         const topLeft = prediction.boundingBox.topLeft;
@@ -66,6 +65,8 @@ async function detectFaces(model) {
             ctx.fillRect(pointX, pointY, 2, 2);
         });
     });
+
+    ctx.restore(); // Restore the canvas to remove the mirroring effect for the next frame
 
     requestAnimationFrame(() => detectFaces(model));
 }
