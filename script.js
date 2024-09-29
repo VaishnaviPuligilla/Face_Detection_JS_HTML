@@ -44,8 +44,8 @@ async function detectFaces(model) {
         const topLeft = prediction.boundingBox.topLeft;
         const bottomRight = prediction.boundingBox.bottomRight;
 
-        // More aggressive adjustment factor to make the bounding box smaller
-        const adjustmentFactor = 0.8; // Reduce the bounding box size by 20%
+        // Use a slight adjustment factor or none at all for a more natural fit
+        const adjustmentFactor = 0.95; // Reduce the bounding box size by 5% to make it slightly smaller
         const x = topLeft[0] + (1 - adjustmentFactor) * (bottomRight[0] - topLeft[0]) / 2;
         const y = topLeft[1] + (1 - adjustmentFactor) * (bottomRight[1] - topLeft[1]) / 2;
         const width = (bottomRight[0] - topLeft[0]) * adjustmentFactor;
@@ -56,20 +56,14 @@ async function detectFaces(model) {
         ctx.lineWidth = 2;
         ctx.strokeRect(x, y, width, height);
 
-        // Draw mesh points with further adjustments to keep them within the bounding box
+        // Draw mesh points without aggressive scaling adjustments
         prediction.scaledMesh.forEach(point => {
-            let pointX = point[0];
-            let pointY = point[1];
+            const pointX = point[0];
+            const pointY = point[1];
 
-            // Scale down each point slightly to keep it within the face boundaries
-            pointX = x + (pointX - x) * 0.8; // Reduce the spread of X values by 20%
-            pointY = y + (pointY - y) * 0.8; // Reduce the spread of Y values by 20%
-
-            // Ensure points are within bounding box
-            if (pointX >= x && pointX <= x + width && pointY >= y && pointY <= y + height) {
-                ctx.fillStyle = 'blue';
-                ctx.fillRect(pointX, pointY, 2, 2);
-            }
+            // Draw the mesh points normally without reducing their positions
+            ctx.fillStyle = 'blue';
+            ctx.fillRect(pointX, pointY, 2, 2);
         });
     });
 
