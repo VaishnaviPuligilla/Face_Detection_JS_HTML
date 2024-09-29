@@ -4,16 +4,21 @@ const ctx = canvas.getContext('2d');
 
 // Function to set up the camera
 async function setupCamera() {
-    const stream = await navigator.mediaDevices.getUserMedia({
-        video: true
-    });
-    video.srcObject = stream;
+    try {
+        const stream = await navigator.mediaDevices.getUserMedia({
+            video: true
+        });
+        video.srcObject = stream;
 
-    return new Promise((resolve) => {
-        video.onloadedmetadata = () => {
-            resolve(video);
-        };
-    });
+        return new Promise((resolve) => {
+            video.onloadedmetadata = () => {
+                resolve(video);
+            };
+        });
+    } catch (error) {
+        console.error('Error accessing the camera:', error);
+        alert('Could not access the camera. Please check your permissions or camera settings.');
+    }
 }
 
 // Load the FaceMesh model
@@ -23,21 +28,9 @@ async function loadFaceMeshModel() {
     return model;
 }
 
-// Detect faces in live video or static image
+// Detect faces in the video stream
 async function detectFaces(model) {
-    let predictions;
-
-    // Check if video is playing and get predictions
-    if (!video.paused) {
-        predictions = await model.estimateFaces(video);
-        console.log("Live video detected");
-    } else {
-        // When a static image is provided, display it and get predictions
-        const staticImage = document.getElementById('static-image'); // Ensure you have a static image element in your HTML
-        ctx.drawImage(staticImage, 0, 0, canvas.width, canvas.height);
-        predictions = await model.estimateFaces(staticImage);
-        console.log("Static image detected");
-    }
+    const predictions = await model.estimateFaces(video);
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     predictions.forEach(prediction => {
