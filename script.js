@@ -27,6 +27,7 @@ async function setupCamera() {
         });
     } catch (error) {
         console.error("Error accessing the camera: ", error);
+        alert("Could not access the camera. Please check permissions and ensure your camera is working.");
     }
 }
 
