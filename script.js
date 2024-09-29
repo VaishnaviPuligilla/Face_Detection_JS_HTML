@@ -33,7 +33,7 @@ async function loadFaceMeshModel() {
 
 async function detectFaces(model) {
     const predictions = await model.estimateFaces(video);
-    
+
     // Clear the canvas and apply mirroring transformation
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.save();
@@ -44,7 +44,7 @@ async function detectFaces(model) {
         const topLeft = prediction.boundingBox.topLeft;
         const bottomRight = prediction.boundingBox.bottomRight;
 
-        // Extract face bounding box coordinates
+        // Extract face bounding box coordinates without any scaling reduction
         const x = topLeft[0];
         const y = topLeft[1];
         const width = bottomRight[0] - topLeft[0];
@@ -60,7 +60,7 @@ async function detectFaces(model) {
             const pointX = point[0];
             const pointY = point[1];
 
-            // Draw a small blue dot for each mesh point
+            // Draw a small blue dot for each mesh point without any adjustment
             ctx.fillStyle = 'blue';
             ctx.fillRect(pointX, pointY, 2, 2);
         });
