@@ -1,5 +1,4 @@
 const video = document.getElementById('video');
-const img = document.getElementById('image'); // Static image for detection
 const canvas = document.getElementById('output');
 const ctx = canvas.getContext('2d');
 
@@ -15,16 +14,18 @@ function decryptData(encryptedData) {
 }
 
 async function setupCamera() {
-    const stream = await navigator.mediaDevices.getUserMedia({
-        video: true
-    });
-    video.srcObject = stream;
+    try {
+        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+        video.srcObject = stream;
 
-    return new Promise((resolve) => {
-        video.onloadedmetadata = () => {
-            resolve(video);
-        };
-    });
+        return new Promise((resolve) => {
+            video.onloadedmetadata = () => {
+                resolve(video);
+            };
+        });
+    } catch (err) {
+        console.error('Error accessing camera: ', err);
+    }
 }
 
 async function loadFaceMeshModel() {
@@ -71,45 +72,19 @@ async function detectFacesLive(model) {
     requestAnimationFrame(() => detectFacesLive(model));
 }
 
-// Detect faces in the static image
-async function detectFacesStatic(model) {
-    const predictions = await model.estimateFaces(img);
-
-    // Clear the canvas and draw the static image
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.drawImage(img, 0, 0, canvas.width, canvas.height); // Draw the static image on canvas
-
-    predictions.forEach(prediction => {
-        const topLeft = prediction.boundingBox.topLeft;
-        const bottomRight = prediction.boundingBox.bottomRight;
-
-        // Draw bounding box
-        ctx.strokeStyle = 'red';
-        ctx.lineWidth = 2;
-        ctx.strokeRect(topLeft[0], topLeft[1], bottomRight[0] - topLeft[0], bottomRight[1] - topLeft[1]);
-
-        // Draw mesh points
-        prediction.scaledMesh.forEach(point => {
-            ctx.fillStyle = 'blue';
-            ctx.fillRect(point[0], point[1], 2, 2); // Draw each point of the mesh
-        });
-    });
-}
-
 async function main() {
     // Load model
     const model = await loadFaceMeshModel();
 
     // Setup video camera
     await setupCamera();
+
+    // Adjust canvas size
     canvas.width = video.videoWidth;
     canvas.height = video.videoHeight;
 
     // Detect faces in live video
     detectFacesLive(model);
-
-    // Uncomment the following line to detect faces in the static image
-    // detectFacesStatic(model);
 }
 
 main();
