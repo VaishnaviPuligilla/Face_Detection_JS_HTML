@@ -1,7 +1,4 @@
-// Import CryptoJS for encryption
-const CryptoJS = require('crypto-js');
-
-const video = document.getElementById('video');
+const img = document.getElementById('image'); // Use an <img> tag to hold the static image
 const canvas = document.getElementById('output');
 const ctx = canvas.getContext('2d');
 
@@ -16,103 +13,49 @@ function decryptData(encryptedData) {
     return bytes.toString(CryptoJS.enc.Utf8);
 }
 
-// Encrypt input image data (example function)
-function encryptImageData(imageData) {
-    return CryptoJS.AES.encrypt(imageData, 'image secret key').toString();
-}
-
-// Decrypt input image data
-function decryptImageData(encryptedImageData) {
-    const bytes = CryptoJS.AES.decrypt(encryptedImageData, 'image secret key');
-    return bytes.toString(CryptoJS.enc.Utf8);
-}
-
-// Setup camera for video input
-async function setupCamera() {
-    const stream = await navigator.mediaDevices.getUserMedia({
-        video: true
-    });
-    video.srcObject = stream;
-
-    return new Promise((resolve) => {
-        video.onloadedmetadata = () => {
-            resolve(video);
-        };
-    });
-}
-
-// Load the Face Mesh model
+// Load Face Mesh model
 async function loadFaceMeshModel() {
     const model = await facemesh.load();
     console.log('Face Mesh model loaded');
-
-    // Example of encrypting model data
+    
+    // Example of how to encrypt some dummy model data
     const modelInfo = 'faceMeshModelInfo'; 
     const encryptedModelData = encryptData(modelInfo);
-    console.log('Encrypted Model Data:', encryptedModelData); // Show the encrypted model data
-    
-    // Show the decrypted model data for verification
+    console.log('Encrypted Model Data:', encryptedModelData); // show the encrypted data
     const decryptedModelInfo = decryptData(encryptedModelData);
-    console.log('Decrypted Model Info:', decryptedModelInfo); // Show the original data after decryption
-    
+    console.log('Decrypted Model Info:', decryptedModelInfo); // show the original data after decryption
     return model;
 }
 
-// Detect faces and display them on canvas
+// Detect faces in the static image
 async function detectFaces(model) {
-    const predictions = await model.estimateFaces(video);
+    // Estimate faces in the static image instead of video
+    const predictions = await model.estimateFaces(img);
 
-    // Clear the canvas and apply mirroring transformation
+    // Clear the canvas
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.save();
-    ctx.scale(-1, 1); // Mirror the canvas horizontally
-    ctx.translate(-canvas.width, 0); // Adjust position after mirroring
+    ctx.drawImage(img, 0, 0, canvas.width, canvas.height); // Draw the static image on canvas
 
     predictions.forEach(prediction => {
         const topLeft = prediction.boundingBox.topLeft;
         const bottomRight = prediction.boundingBox.bottomRight;
 
-        // Adjust bounding box values
-        const adjustmentFactor = 0.85; // Reduce the bounding box size by 15%
-        const x = topLeft[0] + (1 - adjustmentFactor) * (bottomRight[0] - topLeft[0]) / 2;
-        const y = topLeft[1] + (1 - adjustmentFactor) * (bottomRight[1] - topLeft[1]) / 2;
-        const width = (bottomRight[0] - topLeft[0]) * adjustmentFactor;
-        const height = (bottomRight[1] - topLeft[1]) * adjustmentFactor;
-
         // Draw bounding box
         ctx.strokeStyle = 'red';
         ctx.lineWidth = 2;
-        ctx.strokeRect(x, y, width, height);
+        ctx.strokeRect(topLeft[0], topLeft[1], bottomRight[0] - topLeft[0], bottomRight[1] - topLeft[1]);
 
-        // Set a horizontal scaling factor to reduce width of the mesh
-        const horizontalScalingFactor = 0.7; // Scale horizontal size down to 70%
-
-        // Draw mesh points with adjusted horizontal scaling
+        // Draw mesh points
         prediction.scaledMesh.forEach(point => {
-            const pointX = (point[0] - x) * horizontalScalingFactor + x; // Adjust only horizontal
-            const pointY = point[1];
-
-            // Ensure points are within bounding box
-            if (pointX >= x && pointX <= x + width && pointY >= y && pointY <= y + height) {
-                ctx.fillStyle = 'blue';
-                ctx.fillRect(pointX, pointY, 2, 2);
-            }
+            ctx.fillStyle = 'blue';
+            ctx.fillRect(point[0], point[1], 2, 2); // Draw each point of the mesh
         });
     });
-
-    ctx.restore(); // Restore the canvas to remove the mirroring effect for the next frame
-
-    requestAnimationFrame(() => detectFaces(model));
 }
 
-// Main function to run the video and model detection
 async function main() {
-    await setupCamera();
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
     const model = await loadFaceMeshModel();
     detectFaces(model);
 }
 
-// Start the application
 main();
