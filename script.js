@@ -64,8 +64,8 @@ async function detectFaces(model) {
             const isStatic = lastPredictions.slice(-staticImageThreshold).every(pred => {
                 return pred.length === predictions.length &&
                        pred.every((p, index) => {
-                           return p.boundingBox.topLeft[0] === predictions[index].boundingBox.topLeft[0] &&
-                                  p.boundingBox.topLeft[1] === predictions[index].boundingBox.topLeft[1];
+                           return Math.abs(p.boundingBox.topLeft[0] - predictions[index].boundingBox.topLeft[0]) < 5 &&
+                                  Math.abs(p.boundingBox.topLeft[1] - predictions[index].boundingBox.topLeft[1]) < 5;
                        });
             });
 
@@ -78,8 +78,7 @@ async function detectFaces(model) {
     } else {
         // If no face is detected
         if (!staticImageDetected) {
-            alert('No face detected!'); // Alert if no live face is detected
-            staticImageDetected = true; // Set the flag to avoid repeated alerts
+            console.log('No face detected!'); // Log if no live face is detected
         }
     }
 
