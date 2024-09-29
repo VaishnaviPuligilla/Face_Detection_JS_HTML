@@ -9,20 +9,25 @@ function encryptData(data) {
 
 // Decrypt model data
 function decryptData(encryptedData) {
-    return CryptoJS.AES.decrypt(encryptedData, 'secret key 123').toString(CryptoJS.enc.Utf8);
+    const bytes = CryptoJS.AES.decrypt(encryptedData, 'secret key 123');
+    return bytes.toString(CryptoJS.enc.Utf8);
 }
 
 async function setupCamera() {
-    const stream = await navigator.mediaDevices.getUserMedia({
-        video: true
-    });
-    video.srcObject = stream;
+    try {
+        const stream = await navigator.mediaDevices.getUserMedia({
+            video: true
+        });
+        video.srcObject = stream;
 
-    return new Promise((resolve) => {
-        video.onloadedmetadata = () => {
-            resolve(video);
-        };
-    });
+        return new Promise((resolve) => {
+            video.onloadedmetadata = () => {
+                resolve(video);
+            };
+        });
+    } catch (error) {
+        console.error("Error accessing the camera: ", error);
+    }
 }
 
 async function loadFaceMeshModel() {
@@ -31,9 +36,9 @@ async function loadFaceMeshModel() {
     // Example of how to encrypt some dummy model data
     const modelInfo = 'faceMeshModelInfo'; 
     const encryptedModelData = encryptData(modelInfo);
-    console.log('Encrypted Model Data:', encryptedModelData); // show the encrypted data
+    console.log('Encrypted Model Data:', encryptedModelData);
     const decryptedModelInfo = decryptData(encryptedModelData);
-    console.log('Decrypted Model Info:', decryptedModelInfo); // show the original data after decryption
+    console.log('Decrypted Model Info:', decryptedModelInfo);
     return model;
 }
 
