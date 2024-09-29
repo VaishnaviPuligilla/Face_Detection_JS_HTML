@@ -30,15 +30,41 @@ async function loadFaceMeshModel() {
     console.log('Face Mesh model loaded');
     const modelInfo = 'faceMeshModelInfo'; 
     const encryptedModelData = encryptData(modelInfo);
-    console.log('Encrypted Model Data:', encryptedModelData); // show the encrypted data
+    console.log('Encrypted Model Data:', encryptedModelData);
     const decryptedModelInfo = decryptData(encryptedModelData);
-    console.log('Decrypted Model Info:', decryptedModelInfo); // show the original data after decryption
+    console.log('Decrypted Model Info:', decryptedModelInfo);
     return model;
+}
+
+// Function to check if the detected face is a live face
+let blinkCount = 0;
+let blinkThreshold = 5; // Number of frames to count as a blink
+let lastEyeOpenState = true; // Assume eyes are initially open
+
+function isLiveFace(prediction) {
+    const LEFT_EYE = [33, 133, 160, 158, 153, 144]; // Example points for left eye
+    const RIGHT_EYE = [362, 263, 387, 385, 380, 373]; // Example points for right eye
+
+    // Calculate eye openness based on the distance between eyelid landmarks
+    const leftEyeOpen = prediction.scaledMesh[LEFT_EYE[0]][1] - prediction.scaledMesh[LEFT_EYE[3]][1];
+    const rightEyeOpen = prediction.scaledMesh[RIGHT_EYE[0]][1] - prediction.scaledMesh[RIGHT_EYE[3]][1];
+
+    const isEyeOpen = leftEyeOpen > 0 && rightEyeOpen > 0;
+
+    // Check for blink
+    if (!isEyeOpen && lastEyeOpenState) {
+        blinkCount++;
+    }
+
+    lastEyeOpenState = isEyeOpen;
+
+    // Simple condition to detect if the person is blinking enough to be considered alive
+    return blinkCount >= blinkThreshold; // Return true if alive (enough blinks)
 }
 
 async function detectFaces(model) {
     const predictions = await model.estimateFaces(video);
-    
+
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.save();
     ctx.scale(-1, 1);
@@ -47,8 +73,15 @@ async function detectFaces(model) {
     if (predictions.length === 0) {
         alert("Face not visible");
     } else if (predictions.length > 0) {
-        // Only process the first detected face
+        // Process the first detected face
         const prediction = predictions[0];
+
+        // Check for liveness
+        if (!isLiveFace(prediction)) {
+            alert("Face not visible (static image detected)");
+            return;
+        }
+
         const topLeft = prediction.boundingBox.topLeft;
         const bottomRight = prediction.boundingBox.bottomRight;
 
