@@ -44,25 +44,28 @@ async function detectFaces(model) {
         const topLeft = prediction.boundingBox.topLeft;
         const bottomRight = prediction.boundingBox.bottomRight;
 
-        // Extract face bounding box coordinates without any scaling reduction
-        const x = topLeft[0];
-        const y = topLeft[1];
-        const width = bottomRight[0] - topLeft[0];
-        const height = bottomRight[1] - topLeft[1];
+        // Adjust bounding box to fit the face better
+        const adjustmentFactor = 0.9; // Reduce the bounding box size by 10%
+        const x = topLeft[0] + (1 - adjustmentFactor) * (bottomRight[0] - topLeft[0]) / 2;
+        const y = topLeft[1] + (1 - adjustmentFactor) * (bottomRight[1] - topLeft[1]) / 2;
+        const width = (bottomRight[0] - topLeft[0]) * adjustmentFactor;
+        const height = (bottomRight[1] - topLeft[1]) * adjustmentFactor;
 
         // Draw bounding box
         ctx.strokeStyle = 'red';
         ctx.lineWidth = 2;
         ctx.strokeRect(x, y, width, height);
 
-        // Draw mesh points within the bounding box
+        // Draw mesh points and adjust if they exceed facial boundaries
         prediction.scaledMesh.forEach(point => {
             const pointX = point[0];
             const pointY = point[1];
 
-            // Draw a small blue dot for each mesh point without any adjustment
-            ctx.fillStyle = 'blue';
-            ctx.fillRect(pointX, pointY, 2, 2);
+            // Ensure points are within bounding box
+            if (pointX >= topLeft[0] && pointX <= bottomRight[0] && pointY >= topLeft[1] && pointY <= bottomRight[1]) {
+                ctx.fillStyle = 'blue';
+                ctx.fillRect(pointX, pointY, 2, 2);
+            }
         });
     });
 
